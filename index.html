@@ -1,1 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule 1 Pop Mixer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+        :root {
+            --primary-color: #6a8ee8;
+            --secondary-color: #f5a623;
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --border-color: #333;
+            --success-color: #50e3c2;
+            --danger-color: #e35050;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 30px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+        h1 { font-size: 2.2em; }
+        h2 { font-size: 1.6em; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        select#product, select#language {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: #2a2a2a;
+            font-size: 1em;
+            color: var(--text-color);
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236a8ee8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px auto;
+            cursor: pointer;
+        }
+
+        .language-selector {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .substance-selection {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+            min-height: 250px;
+        }
+
+        .substance-list {
+            width: 48%;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            background-color: #2a2a2a;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .substance-list h3 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--secondary-color);
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .substance-item {
+            background-color: #333;
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            cursor: grab;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-color);
+        }
+        .substance-item:active { cursor: grabbing; }
+        .substance-item:hover { background-color: #444; }
+        .substance-item span { font-weight: bold; color: var(--primary-color); }
+        .substance-item.dragging { opacity: 0.5; background-color: #555; }
+        .substance-item.over { border-top: 2px solid var(--secondary-color); }
+
+        #calculate {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--primary-color), #3a7ac0);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background 0.3s ease, transform 0.1s ease;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        #calculate:hover { background: linear-gradient(135deg, #3a7ac0, var(--primary-color)); }
+        #calculate:active { transform: scale(0.98); }
+
+        #results {
+            background-color: #1a2a1a;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 25px;
+            border: 1px solid var(--success-color);
+        }
+        #results h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #4caf50;
+            text-align: center;
+            border-bottom: 1px solid #2e7d32;
+            padding-bottom: 8px;
+        }
+        #results p { margin: 8px 0; font-size: 1em; }
+        #results strong { color: #81c784; }
+        #result-effects span {
+             display: inline-block;
+             background-color: var(--primary-color);
+             color: white;
+             padding: 3px 8px;
+             margin: 2px;
+             border-radius: 4px;
+             font-size: 0.9em;
+        }
+         #result-effects.no-effects span {
+            background-color: #666;
+            color: #ccc;
+        }
+
+        .recommendation {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #332200;
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: var(--shadow);
+        }
+        .recommendation p { margin-bottom: 10px; }
+        .recommendation a {
+            color: #ff9800;
+            font-weight: bold;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .recommendation a:hover { color: #ffab40; text-decoration: underline; }
+
+        .placeholder {
+            background-color: #444;
+            height: 40px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border: 2px dashed #666;
+        }
+
+        #limit-message {
+            color: var(--danger-color);
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+            height: 1em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="language-selector">
+            <select id="language">
+                <option value="en">English</option>
+                <option value="ru">Русский (WIP)</option>
+            </select>
+        </div>
+
+        <h1 id="title">Schedule 1 Stuff Mixer</h1>
+        <h2 id="subtitle">Configure Your Mix</h2>
+
+        <div>
+            <label id="product-label" for="product">Select Base Product:</label>
+            <select id="product"></select>
+        </div>
+
+        <label id="substances-label">Add Substances (Drag & Drop to Mix/Reorder - Max 8):</label>
+        <div class="substance-selection">
+            <div class="substance-list" id="available-substances">
+                <h3 id="available-title">Available Substances</h3>
+                </div>
+            <div class="substance-list" id="selected-substances" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
+                 <h3 id="selected-title">Selected Mix (Drag to Reorder)</h3>
+                 <div id="limit-message"></div>
+                 </div>
+        </div>
+
+        <button id="calculate">Calculate Mix</button>
+
+        <div id="results">
+            <h3 id="results-title">Mix Results</h3>
+            <p><strong id="effects-label">Effects:</strong> <span id="result-effects"><span>---</span></span></p>
+            <p><strong id="cost-label">Total Cost:</strong> $<span id="result-cost">---</span></p>
+            <p><strong id="sellprice-label">Est. Sell Price:</strong> $<span id="result-sellPrice">---</span></p>
+            <p><strong id="profit-label">Est. Profit:</strong> $<span id="result-profit">---</span></p>
+            <p><strong id="margin-label">Profit Margin:</strong> <span id="result-profitMargin">---</span>%</p>
+            <p><strong id="addiction-label">Addiction:</strong> <span id="result-addiction">---</span>%</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Translations ---
+        const translations = {
+            en: {
+                title: "Schedule 1 Mixer",
+                subtitle: "Configure Your Mix",
+                productLabel: "Select Base Product:",
+                substancesLabel: "Add Substances (Drag & Drop to Mix/Reorder - Max 8):",
+                availableTitle: "Available Substances",
+                selectedTitle: "Selected Mix (Drag to Reorder)",
+                resultsTitle: "Mix Results",
+                effectsLabel: "Effects:",
+                costLabel: "Total Cost:",
+                sellpriceLabel: "Est. Sell Price:",
+                profitLabel: "Est. Profit:",
+                marginLabel: "Profit Margin:",
+                addictionLabel: "Addiction:",
+                calculateButton: "Calculate Mix",
+                limitMessage: "Cannot add more than 8 substances!",
+                maxReached: "Maximum 8 substances reached.",
+                noEffects: "None",
+                removeTooltip: "Click to remove",
+                products: {
+                    'OG Kush': 'OG Kush',
+                    'Sour Diesel': 'Sour Diesel',
+                    'Green Crack': 'Green Crack',
+                    'Grandaddy Purple': 'Grandaddy Purple',
+                    'Meth': 'Meth',
+                    'Cocaine': 'Cocaine'
+                },
+                substances: {
+                    'Cuke': 'Cuke',
+                    'Flu Medicine': 'Flu Medicine',
+                    'Gasoline': 'Gasoline',
+                    'Donut': 'Donut',
+                    'Energy Drink': 'Energy Drink',
+                    'Mouth Wash': 'Mouth Wash',
+                    'Motor Oil': 'Motor Oil',
+                    'Banana': 'Banana',
+                    'Chili': 'Chili',
+                    'Iodine': 'Iodine',
+                    'Paracetamol': 'Paracetamol',
+                    'Viagra': 'Viagra',
+                    'Horse Semen': 'Horse Semen',
+                    'Mega Bean': 'Mega Bean',
+                    'Addy': 'Addy',
+                    'Battery': 'Battery'
+                }
+            },
+            ru: {
+                title: "Миксер Schedule 1",
+                subtitle: "Настройте свой микс",
+                productLabel: "Выберите базовый продукт:",
+                substancesLabel: "Добавьте вещества (Перетащите для смешивания/изменения порядка - макс. 8):",
+                availableTitle: "Доступные вещества",
+                selectedTitle: "Выбранный микс (Перетащите для изменения порядка)",
+                resultsTitle: "Результаты микса",
+                effectsLabel: "Эффекты:",
+                costLabel: "Общая стоимость:",
+                sellpriceLabel: "Примерная цена продажи:",
+                profitLabel: "Примерная прибыль:",
+                marginLabel: "Маржа прибыли:",
+                addictionLabel: "Зависимость:",
+                calculateButton: "Рассчитать микс",
+                limitMessage: "Нельзя добавить более 8 веществ!",
+                maxReached: "Достигнут максимум 8 веществ.",
+                noEffects: "Нет",
+                removeTooltip: "Кликните для удаления",
+                products: {
+                    'OG Kush': 'OG Куш',
+                    'Sour Diesel': 'Сур Дизель',
+                    'Green Crack': 'Грин Крэк',
+                    'Grandaddy Purple': 'Гранддэдди Пёрпл',
+                    'Meth': 'Мет',
+                    'Cocaine': 'Кокаин'
+                },
+                substances: {
+                    'Cuke': 'Огурец',
+                    'Flu Medicine': 'Лекарство от гриппа',
+                    'Gasoline': 'Бензин',
+                    'Donut': 'Пончик',
+                    'Energy Drink': 'Энергетик',
+                    'Mouth Wash': 'Ополаскиватель для рта',
+                    'Motor Oil': 'Моторное масло',
+                    'Banana': 'Банан',
+                    'Chili': 'Чили',
+                    'Iodine': 'Йод',
+                    'Paracetamol': 'Парацетамол',
+                    'Viagra': 'Виагра',
+                    'Horse Semen': 'Конская сперма',
+                    'Mega Bean': 'Мега боб',
+                    'Addy': 'Адди',
+                    'Battery': 'Батарейка'
+                }
+            }
+        };
+
+        // --- Data ---
+        const products = {
+            'OG Kush': { price: 35, effects: ['Ca'], abbreviation: 'OH' },
+            'Sour Diesel': { price: 35, effects: ['Re'], abbreviation: 'SL' },
+            'Green Crack': { price: 35, effects: ['En'], abbreviation: 'GK' },
+            'Grandaddy Purple': { price: 35, effects: ['Se'], abbreviation: 'GE' },
+            'Meth': { price: 70, effects: [], abbreviation: 'MH' },
+            'Cocaine': { price: 150, effects: [], abbreviation: 'CE' },
+        };
+        
+        const substances = {
+            'Cuke': { abbreviation: 'A', rank: '1', price: 2, effect: ['En'] },
+            'Flu Medicine': { abbreviation: 'B', rank: '4', price: 5, effect: ['Se'] },
+            'Gasoline': { abbreviation: 'C', rank: '5', price: 5, effect: ['To'] },
+            'Donut': { abbreviation: 'D', rank: '1', price: 3, effect: ['Cd'] },
+            'Energy Drink': { abbreviation: 'E', rank: '6', price: 6, effect: ['At'] },
+            'Mouth Wash': { abbreviation: 'F', rank: '3', price: 4, effect: ['Ba'] },
+            'Motor Oil': { abbreviation: 'G', rank: '7', price: 6, effect: ['Sl'] },
+            'Banana': { abbreviation: 'H', rank: '1', price: 2, effect: ['Gi'] },
+            'Chili': { abbreviation: 'I', rank: '9', price: 7, effect: ['Sp'] },
+            'Iodine': { abbreviation: 'J', rank: '11', price: 8, effect: ['Je'] },
+            'Paracetamol': { abbreviation: 'K', rank: '1', price: 3, effect: ['Sn'] },
+            'Viagra': { abbreviation: 'L', rank: '2', price: 4, effect: ['Tt'] },
+            'Horse Semen': { abbreviation: 'M', rank: '13', price: 9, effect: ['Lf'] },
+            'Mega Bean': { abbreviation: 'N', rank: '8', price: 7, effect: ['Fo'] },
+            'Addy': { abbreviation: 'O', rank: '12', price: 9, effect: ['Tp'] },
+            'Battery': { abbreviation: 'P', rank: '10', price: 8, effect: ['Be'] },
+        };
+        
+        const effectsData = {
+            Ca: { name: { en: 'Calming', ru: 'Успокаивающий' }, price: 0.1, addiction: 0 },
+            Re: { name: { en: 'Refreshing', ru: 'Освежающий' }, price: 0.14, addiction: 0.104 },
+            En: { name: { en: 'Energizing', ru: 'Энергичный' }, price: 0.22, addiction: 0.34 },
+            Se: { name: { en: 'Sedating', ru: 'Седативный' }, price: 0.26, addiction: 0 },
+            Be: { name: { en: 'Bright-Eyed', ru: 'Бодрый' }, price: 0.4, addiction: 0.2 },
+            Cd: { name: { en: 'Calorie-Dense', ru: 'Калорийный' }, price: 0.28, addiction: 0.1 },
+            Eu: { name: { en: 'Euphoric', ru: 'Эйфория' }, price: 0.18, addiction: 0.235 },
+            To: { name: { en: 'Toxic', ru: 'Токсичный' }, price: 0, addiction: 0 },
+            At: { name: { en: 'Athletic', ru: 'Атлетический' }, price: 0.32, addiction: 0.607 },
+            Ba: { name: { en: 'Balding', ru: 'Облысение' }, price: 0.3, addiction: 0 },
+            Ag: { name: { en: 'Anti-Gravity', ru: 'Антигравитация' }, price: 0.54, addiction: 0.611 },
+            Mu: { name: { en: 'Munchies', ru: 'Жор' }, price: 0.12, addiction: 0.096 },
+            Sl: { name: { en: 'Slippery', ru: 'Скользкий' }, price: 0.34, addiction: 0.309 },
+            Gi: { name: { en: 'Gingeritis', ru: 'Рыжий' }, price: 0.2, addiction: 0 },
+            Sn: { name: { en: 'Sneaky', ru: 'Скрытный' }, price: 0.24, addiction: 0.327 },
+            Tp: { name: { en: 'Thought-Provoking', ru: 'Мыслительный' }, price: 0.44, addiction: 0.37 },
+            Sp: { name: { en: 'Spicy', ru: 'Острый' }, price: 0.38, addiction: 0.665 },
+            Pa: { name: { en: 'Paranoia', ru: 'Паранойя' }, price: 0, addiction: 0 },
+            Tt: { name: { en: 'Tropic Thunder', ru: 'Тропический гром' }, price: 0.46, addiction: 0.803 },
+            Gl: { name: { en: 'Glowing', ru: 'Свечение' }, price: 0.48, addiction: 0.472 },
+            Cy: { name: { en: 'Cyclopean', ru: 'Циклоп' }, price: 0.56, addiction: 0.1 },
+            Fo: { name: { en: 'Foggy', ru: 'Туманный' }, price: 0.36, addiction: 0.1 },
+            Ex: { name: { en: 'Explosive', ru: 'Взрывной' }, price: 0, addiction: 0 },
+            La: { name: { en: 'Laxative', ru: 'Слабительный' }, price: 0, addiction: 0.1 },
+            Lf: { name: { en: 'Long Faced', ru: 'Длинное лицо' }, price: 0.52, addiction: 0.607 },
+            Je: { name: { en: 'Jennerising', ru: 'Дженнеризация' }, price: 0.42, addiction: 0.343 },
+            El: { name: { en: 'Electrifying', ru: 'Электризующий' }, price: 0.5, addiction: 0.235 },
+            Di: { name: { en: 'Disorienting', ru: 'Дезориентирующий' }, price: 0, addiction: 0 },
+            Sc: { name: { en: 'Schizophrenia', ru: 'Шизофрения' }, price: 0, addiction: 0 },
+            Si: { name: { en: 'Seizure-Inducing', ru: 'Судорожный' }, price: 0, addiction: 0 },
+            Zo: { name: { en: 'Zombifying', ru: 'Зомбирующий' }, price: 0.58, addiction: 0.598 },
+            Fc: { name: { en: 'Focused', ru: 'Сосредоточенный' }, price: 0.16, addiction: 0.104 },
+            Sm: { name: { en: 'Smelly', ru: 'Вонючий' }, price: 0, addiction: 0 },
+            Sh: { name: { en: 'Shrinking', ru: 'Уменьшение' }, price: 0.6, addiction: 0.336 },
+        };
+        
+        const simpleRules = {
+            'Flu Medicine': { ifPresent: ['Ca'], replace: { Ca: 'Be' } },
+            'Cuke': { ifPresent: ['Eu'], replace: { Eu: 'La' } },
+            'Gasoline': { ifPresent: ['En'], replace: { En: 'Eu'} },
+        };
+        
+        const MAX_SUBSTANCES = 8;
+
+        // --- UI Elements ---
+        const languageSelect = document.getElementById('language');
+        const productSelect = document.getElementById('product');
+        const availableSubstancesDiv = document.getElementById('available-substances');
+        const selectedSubstancesDiv = document.getElementById('selected-substances');
+        const calculateButton = document.getElementById('calculate');
+        const resultsDiv = document.getElementById('results');
+        const limitMessageDiv = document.getElementById('limit-message');
+
+        // --- Current Language ---
+        let currentLanguage = 'en';
+
+        // --- Language Change Handler ---
+        languageSelect.addEventListener('change', function() {
+            currentLanguage = this.value;
+            updateUI();
+        });
+
+        // --- Update UI with Translations ---
+        function updateUI() {
+            const t = translations[currentLanguage];
+            
+            // Update interface text
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('product-label').textContent = t.productLabel;
+            document.getElementById('substances-label').textContent = t.substancesLabel;
+            document.getElementById('available-title').textContent = t.availableTitle;
+            document.getElementById('selected-title').textContent = t.selectedTitle;
+            document.getElementById('results-title').textContent = t.resultsTitle;
+            document.getElementById('effects-label').textContent = t.effectsLabel;
+            document.getElementById('cost-label').textContent = t.costLabel;
+            document.getElementById('sellprice-label').textContent = t.sellpriceLabel;
+            document.getElementById('profit-label').textContent = t.profitLabel;
+            document.getElementById('margin-label').textContent = t.marginLabel;
+            document.getElementById('addiction-label').textContent = t.addictionLabel;
+            calculateButton.textContent = t.calculateButton;
+            
+            // Update products dropdown
+            productSelect.innerHTML = '';
+            Object.keys(products).forEach(prodKey => {
+                const option = document.createElement('option');
+                option.value = prodKey;
+                option.textContent = t.products[prodKey] || prodKey;
+                productSelect.appendChild(option);
+            });
+            
+            // Update substances lists
+            renderAvailableSubstances();
+            
+            // Update effects in results if any
+            const effectsContainer = document.getElementById('result-effects');
+            if (effectsContainer.textContent.trim() === '---' || effectsContainer.textContent.trim() === t.noEffects) {
+                effectsContainer.innerHTML = `<span>${t.noEffects}</span>`;
+                effectsContainer.classList.add('no-effects');
+            }
+        }
+
+        // --- Populate Available Substances ---
+        function renderAvailableSubstances() {
+            const t = translations[currentLanguage];
+            availableSubstancesDiv.innerHTML = `<h3>${t.availableTitle}</h3>`;
+            const selectedSubstanceNames = new Set(
+                Array.from(selectedSubstancesDiv.querySelectorAll('.substance-item')).map(item => item.dataset.substanceName)
+            );
+
+            Object.entries(substances).forEach(([subKey, subData]) => {
+                 if (!selectedSubstanceNames.has(subKey)) {
+                    const subName = t.substances[subKey] || subKey;
+                    const item = document.createElement('div');
+                    item.classList.add('substance-item');
+                    item.draggable = true;
+                    item.id = `avail-${subKey.replace(/\s+/g, '-')}`;
+                    item.dataset.substanceName = subKey;
+                    item.textContent = `${subName} `;
+                    const priceSpan = document.createElement('span');
+                    priceSpan.textContent = ` ($${subData.price})`;
+                    item.appendChild(priceSpan);
+
+                    item.addEventListener('dragstart', dragStart);
+                    availableSubstancesDiv.appendChild(item);
+                }
+            });
+            
+            // Update selected substances titles
+            Array.from(selectedSubstancesDiv.querySelectorAll('.substance-item')).forEach(item => {
+                const subKey = item.dataset.substanceName;
+                const subName = t.substances[subKey] || subKey;
+                item.textContent = `${subName} `;
+                const priceSpan = document.createElement('span');
+                priceSpan.textContent = ` ($${substances[subKey].price})`;
+                item.appendChild(priceSpan);
+            });
+        }
+
+        // --- Drag and Drop Variables ---
+        let draggedItem = null;
+        let placeholder = document.createElement('div');
+        placeholder.classList.add('placeholder');
+
+        // --- Drag and Drop Functions ---
+        function dragStart(event) {
+            draggedItem = event.target;
+            event.dataTransfer.setData('text/plain', event.target.id);
+            setTimeout(() => {
+                 const selectedCount = selectedSubstancesDiv.querySelectorAll('.substance-item').length;
+                 if (selectedCount >= MAX_SUBSTANCES && !selectedSubstancesDiv.contains(draggedItem)) {
+                 } else {
+                    draggedItem.style.display = 'none';
+                 }
+            }, 0);
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+            const targetList = event.currentTarget;
+            if (targetList.id === 'selected-substances') {
+                 const selectedCount = targetList.querySelectorAll('.substance-item').length;
+                  if (selectedCount < MAX_SUBSTANCES || (draggedItem && targetList.contains(draggedItem))) {
+                     targetList.style.backgroundColor = '#1a2a1a';
+                     updatePlaceholder(event);
+                 } else {
+                     event.dataTransfer.dropEffect = 'none';
+                 }
+            } else if (targetList.id === 'available-substances') {
+                 targetList.style.backgroundColor = '#1a1a2a';
+                 updatePlaceholder(event);
+            }
+        }
+
+        function updatePlaceholder(event) {
+            const list = event.currentTarget;
+            const mouseY = event.clientY;
+            const items = Array.from(list.querySelectorAll('.substance-item:not(.dragging)'));
+            let closestItem = null;
+            let minDistance = Infinity;
+
+            items.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                const distance = Math.abs(mouseY - midY);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestItem = item;
+                }
+            });
+
+            if (closestItem) {
+                 const rect = closestItem.getBoundingClientRect();
+                 if (mouseY < rect.top + rect.height / 2) {
+                    list.insertBefore(placeholder, closestItem);
+                 } else {
+                     list.insertBefore(placeholder, closestItem.nextSibling);
+                 }
+            } else {
+                 list.appendChild(placeholder);
+            }
+             placeholder.style.display = 'block';
+        }
+
+        function dragLeave(event) {
+            const list = event.currentTarget;
+            list.style.backgroundColor = '';
+             if (!list.contains(event.relatedTarget)) {
+                 placeholder.style.display = 'none';
+             }
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const targetList = event.currentTarget;
+            targetList.style.backgroundColor = '';
+            placeholder.style.display = 'none';
+
+            const id = event.dataTransfer.getData('text/plain');
+            const originalItem = document.getElementById(id);
+             let itemToMove = originalItem || draggedItem;
+
+             if (!itemToMove && draggedItem) {
+                const subKey = draggedItem.dataset.substanceName;
+                 itemToMove = createSubstanceItem(subKey, substances[subKey]);
+             }
+
+            if (!itemToMove) return;
+
+            const selectedCount = selectedSubstancesDiv.querySelectorAll('.substance-item').length;
+            const isMovingToSelected = targetList.id === 'selected-substances';
+            const isFromAvailable = availableSubstancesDiv.contains(itemToMove) || !selectedSubstancesDiv.contains(itemToMove);
+
+            if (isMovingToSelected && isFromAvailable && selectedCount >= MAX_SUBSTANCES) {
+                limitMessageDiv.textContent = translations[currentLanguage].limitMessage;
+                itemToMove.style.display = 'flex';
+                 renderAvailableSubstances();
+                return;
+            }
+
+            if (placeholder.parentNode === targetList) {
+                 targetList.insertBefore(itemToMove, placeholder);
+            } else {
+                 targetList.appendChild(itemToMove);
+            }
+
+            itemToMove.style.display = 'flex';
+            draggedItem = null;
+
+            updateSubstanceListsUI();
+        }
+
+        function updateSubstanceListsUI() {
+            renderAvailableSubstances();
+             const selectedCount = selectedSubstancesDiv.querySelectorAll('.substance-item').length;
+             limitMessageDiv.textContent = selectedCount >= MAX_SUBSTANCES ? translations[currentLanguage].maxReached : '';
+        }
+
+         function createSubstanceItem(subKey, subData) {
+            const t = translations[currentLanguage];
+            const subName = t.substances[subKey] || subKey;
+            const item = document.createElement('div');
+            item.classList.add('substance-item');
+            item.draggable = true;
+            item.id = `${selectedSubstancesDiv.id}-${subKey.replace(/\s+/g, '-')}`;
+            item.dataset.substanceName = subKey;
+            item.textContent = `${subName} `;
+            const priceSpan = document.createElement('span');
+            priceSpan.textContent = ` ($${subData.price})`;
+            item.appendChild(priceSpan);
+            item.addEventListener('dragstart', dragStart);
+             if (selectedSubstancesDiv.contains(item) || !availableSubstancesDiv.contains(item)) {
+                 item.addEventListener('click', () => {
+                     item.remove();
+                     updateSubstanceListsUI();
+                 });
+                 item.title = t.removeTooltip;
+             }
+             return item;
+        }
+
+        // --- Calculation Logic ---
+        calculateButton.addEventListener('click', () => {
+            const selectedProductKey = productSelect.value;
+            const selectedProductData = products[selectedProductKey];
+
+            const selectedSubstanceItems = selectedSubstancesDiv.querySelectorAll('.substance-item');
+            const selectedSubstanceKeys = Array.from(selectedSubstanceItems).map(item => item.dataset.substanceName);
+
+            if (selectedSubstanceKeys.length > MAX_SUBSTANCES) {
+                alert(`Error: More than ${MAX_SUBSTANCES} substances selected.`);
+                return;
+            }
+
+            let currentEffects = new Set(selectedProductData.effects);
+            let totalCost = 0;
+
+            selectedSubstanceKeys.forEach(subKey => {
+                const subData = substances[subKey];
+                if (!subData) return;
+
+                totalCost += subData.price;
+
+                const ruleSet = simpleRules[subKey];
+                if (ruleSet && ruleSet.ifPresent.every(eff => currentEffects.has(eff))) {
+                    for (const [oldEffect, newEffect] of Object.entries(ruleSet.replace)) {
+                        if (currentEffects.has(oldEffect)) {
+                            currentEffects.delete(oldEffect);
+                            if (currentEffects.size < MAX_SUBSTANCES && !currentEffects.has(newEffect)) {
+                                currentEffects.add(newEffect);
+                            }
+                        }
+                    }
+                }
+
+                if (subData.effect) {
+                     subData.effect.forEach(eff => {
+                        if (currentEffects.size < MAX_SUBSTANCES && !currentEffects.has(eff)) {
+                            currentEffects.add(eff);
+                        }
+                     });
+                }
+            });
+
+            const finalEffectsArray = Array.from(currentEffects).slice(0, MAX_SUBSTANCES);
+            let effectValue = 0;
+            let addictionValue = 0;
+
+            finalEffectsArray.forEach(effCode => {
+                const effect = effectsData[effCode];
+                if (effect) {
+                    effectValue += effect.price || 0;
+                    addictionValue += effect.addiction || 0;
+                }
+            });
+
+            const sellPrice = Math.round(selectedProductData.price * (1 + effectValue));
+            const profit = sellPrice - totalCost;
+            const profitMargin = sellPrice > 0 ? Math.round((profit / sellPrice) * 10000) / 100 : 0;
+            const addiction = Math.round(addictionValue * 100);
+
+            const effectsSpan = document.getElementById('result-effects');
+            effectsSpan.innerHTML = '';
+            if (finalEffectsArray.length > 0) {
+                effectsSpan.classList.remove('no-effects');
+                finalEffectsArray.forEach(effCode => {
+                    const effectName = effectsData[effCode]?.name[currentLanguage] || effCode;
+                    const effectBadge = document.createElement('span');
+                    effectBadge.textContent = effectName;
+                    effectsSpan.appendChild(effectBadge);
+                 });
+            } else {
+                 effectsSpan.classList.add('no-effects');
+                 const noEffectBadge = document.createElement('span');
+                 noEffectBadge.textContent = translations[currentLanguage].noEffects;
+                 effectsSpan.appendChild(noEffectBadge);
+            }
+
+            document.getElementById('result-cost').textContent = totalCost;
+            document.getElementById('result-sellPrice').textContent = sellPrice;
+            document.getElementById('result-profit').textContent = profit;
+            document.getElementById('result-profitMargin').textContent = profitMargin.toFixed(2);
+            document.getElementById('result-addiction').textContent = addiction;
+        });
+
+        // --- Initialization ---
+        updateUI();
+    </script>
+</body>
+</html>
